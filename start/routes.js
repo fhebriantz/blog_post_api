@@ -28,5 +28,9 @@ Route.get('/', async ({ request, response }) => {
   Route.group(() => {
     Route.post('/data_kuadrat', 'DashboardController.dataKuadrat')
     Route.get('/get_kelas', 'DashboardController.dataKelas')
+    Route.post('/insert_siswa', 'DashboardController.insertSiswa')
+    Route.post('/update_siswa', 'DashboardController.updateSiswa')
+    Route.post('/delete_siswa', 'DashboardController.deleteSiswa')
+    Route.get('/show_siswa', 'DashboardController.showSiswa')
   })
 
