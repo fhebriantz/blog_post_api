@@ -7,19 +7,7 @@ const Encryption = use('Encryption')
 class UserController {
   async login({ request, response }) {
     try {
-      
-    } catch (error) {
-      if(error.name === 'PasswordMisMatchException'){
-        response.status(401)
-        return [{
-          field : 'password',
-          message: 'Alamat email dan password tidak sesuai'
-        }]
-      }else{
-        response.status(500).json(error)
-      }
-    }
-    const { email, password} = request.all();
+      const { email, password} = request.all();
 
     const rules = {
         email: "required", //1 req or not req, 2 tipe, 3 aturan uniq (schema.table,kolom)
@@ -56,6 +44,18 @@ class UserController {
           message: 'Berhasil Login',
           data : user
         }
+    } catch (error) {
+      if(error.name === 'PasswordMisMatchException'){
+        response.status(401)
+        return [{
+          field : 'password',
+          message: 'Alamat email dan password tidak sesuai'
+        }]
+      }else{
+        response.status(500).json(error)
+      }
+    }
+    
   }
 }
 
