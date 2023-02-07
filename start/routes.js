@@ -16,14 +16,14 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.get('/', async ({ request, response }) => {
-  return {
-    greeting: 'Hello world in JSON',
-    no_tiket : request.tiket
-  }
-}).middleware([
-    'tiketRandom'
-  ])
+  Route.get('/', async ({ request, response }) => {
+    return {
+      greeting: 'Hello world in JSON',
+      no_tiket : request.tiket
+    }
+  }).middleware([
+      'tiketRandom'
+    ])
 
   Route.group(() => {
     Route.post('/data_kuadrat', 'DashboardController.dataKuadrat')
@@ -32,5 +32,9 @@ Route.get('/', async ({ request, response }) => {
     Route.post('/update_siswa', 'DashboardController.updateSiswa')
     Route.post('/delete_siswa', 'DashboardController.deleteSiswa')
     Route.get('/show_siswa', 'DashboardController.showSiswa')
+  })
+
+  Route.group(() => {
+    Route.post('/login', 'UserController.login')
   })
 

@@ -1,6 +1,5 @@
 'use strict'
 const Database = use('Database')
-
 const { validate } = use('Validator')
 
 class DashboardController {
@@ -47,28 +46,28 @@ class DashboardController {
     }
 
      async insertSiswa ({ request, response }) {
-        const params = request.all()
-        
-        //atribut apa aja yg wajib
-        const validation = await validate(params, {
-            nama: 'required',
-            email: 'required',
-            password: 'required',
-            kelas: 'required',
-            umur: 'required|number'
-        })
+        const { nama, email, password, kelas, umur } = request.all();
 
-        //logic validasi
+        const rules = {
+            nama: "required",
+            email: "required|email|unique:public.siswas,email", //1 req or not req, 2 tipe, 3 aturan uniq (schema.table,kolom)
+            password: "required",
+            kelas: "required",
+            umur: "required|number",
+        };
+
+        const validation = await validate(request.all(), rules);
+
         if (validation.fails()) {
-            response.status(400)
-            return validation.messages()
+            response.status(400);
+            return validation.messages();
         }
-
+        const emailLower = email.toLowerCase()
         // contoh query insert
         await Database.raw(`
         INSERT INTO public.siswas
             (nama, email, "password", kelas, umur)
-            VALUES('${params.nama}', '${params.email}', '${params.password}', '${params.kelas}', ${params.umur});            
+            VALUES('${nama}', '${emailLower}', '${password}', '${kelas}', ${umur});            
         `) 
 
         const data = await Database.raw(`select * from public.siswas`)
