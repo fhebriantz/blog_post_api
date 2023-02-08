@@ -1,6 +1,8 @@
 'use strict'
 const Database = use('Database')
 const { validate } = use('Validator')
+const Hash = use('Hash')
+const Helpers = use('Helpers')
 
 class DashboardController {
     async dataKuadrat ({ request, response }) {
@@ -62,12 +64,30 @@ class DashboardController {
             response.status(400);
             return validation.messages();
         }
+
+        // const profilePic = request.file('profile_pic', {
+        //     types: ['image'],
+        //     size: '2mb'
+        // })
+        
+        // await profilePic.move(Helpers.tmpPath('uploads'), {
+        //     name: 'custom-name.jpg',
+        //     overwrite: true
+        // })
+    
+        // if (!profilePic.moved()) {
+        //     return profilePic.error()
+        // }
+
         const emailLower = email.toLowerCase()
         // contoh query insert
+
+        const safePassword = await Hash.make(password)
+
         await Database.raw(`
         INSERT INTO public.siswas
             (nama, email, "password", kelas, umur)
-            VALUES('${nama}', '${emailLower}', '${password}', '${kelas}', ${umur});            
+            VALUES('${nama}', '${emailLower}', '${safePassword}', '${kelas}', ${umur});            
         `) 
 
         const data = await Database.raw(`select * from public.siswas`)
@@ -79,6 +99,44 @@ class DashboardController {
         }
         
     }
+
+    async importSiswa({ request, response }) {
+        const filecsv = request.file('file_csv', {
+          extnames: ['csv']
+        })
+    
+        if (filecsv) {
+          const csvFilePath = filecsv.tmpPath
+          const csv = require('csvtojson')
+          let array_siswa = new Array //nampung values
+          
+          const arr = await csv({
+            delimiter: ","
+          }).fromFile(csvFilePath)
+    
+          for (let i = 0; i < arr.length; i++) { //looping isi values
+            const safePassword = await Hash.make(arr[i].password)
+            array_siswa.push(`('${arr[i].nama}','${arr[i].email}','${safePassword}','${arr[i].kelas}','${arr[i].umur}')`);
+          }
+          await Database.raw(`INSERT INTO public.siswas
+          (nama, email, "password", kelas, umur)
+            VALUES ${array_siswa.toString()}`) //store values
+    
+        const data = await Database.raw(`select * from public.siswas`)
+    
+        //ngasih pesan berhasil
+        return {
+            messages : 'data berhasil diimput',
+            data : data.rows
+        }
+    
+        } else {
+          response.status(400)
+          return {
+            message: 'Please insert csv file!'
+          }
+        }
+      }
 
     async updateSiswa ({ request, response }) {
         const params = request.all()
