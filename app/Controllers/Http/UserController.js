@@ -1,9 +1,9 @@
 "use strict";
 const Database = use("Database");
 const { validate } = use('Validator')
-// const Encryption = use('Encryption')
-const Encryption = use('Encryption')
+const Env = use('Env')
 const Hash = use('Hash')
+const jwt = require('jsonwebtoken');
 
 
 class UserController {
@@ -21,19 +21,6 @@ class UserController {
         response.status(400);
         return validation.messages();
     }
-      // ecryption
-      // return Encryption.encrypt('hello world')
-      // return Encryption.decrypt('5f929576cbba3c1b98f515a456859042OKM3G/dy+1R/ZnujftILjA==')
-
-      // hash
-      // const safePassword = await Hash.make('hello world')
-      // const isSame = await Hash.verify('hello world', '$2a$10$ndBsHioX5csH3At7LaCWvuQVjAEPJO9dKx1quADYvzZ5mzflIFrOq')
-
-      // const isSame = await Hash.verify('plain-value', 'hashed-value')
-
-      // if (isSame) {
-      //   // ...
-      // }
 
       const emailLower = email.toLowerCase()
       const checkuser = await Database.raw(`select * from public.siswas where email = '${emailLower}'`)
@@ -48,6 +35,7 @@ class UserController {
       const isSame = await Hash.verify(password, checkuser.rows[0].password)
 
       if (isSame) {
+        
         let dataUser = checkuser.rows[0]
         let user = {
           id_siswa: dataUser.id,
@@ -57,9 +45,9 @@ class UserController {
           umur: dataUser.umur
         }
         
+        var token = jwt.sign(user, Env.get('APP_KEY'));
         return {
-          message: 'Berhasil Login',
-          data : user
+          token:token
         }
       }else{
         response.status(401)

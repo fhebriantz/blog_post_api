@@ -16,6 +16,10 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
+
+ 
+
+  
   Route.get('/', async ({ request, response }) => {
     return {
       greeting: 'Hello world in JSON',
@@ -33,9 +37,12 @@ const Route = use('Route')
     Route.post('/update_siswa', 'DashboardController.updateSiswa')
     Route.post('/delete_siswa', 'DashboardController.deleteSiswa')
     Route.get('/show_siswa', 'DashboardController.showSiswa')
-  })
+  }).middleware([
+    'tiketRandom'
+  ])
 
   Route.group(() => {
     Route.post('/login', 'UserController.login')
   })
+
 

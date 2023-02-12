@@ -140,7 +140,7 @@ class DashboardController {
 
     async updateSiswa ({ request, response }) {
         const params = request.all()
-        
+        const { dataUser } = request
         //atribut apa aja yg wajib
         const validation = await validate(params, {
             nama: 'required',
@@ -160,7 +160,7 @@ class DashboardController {
         // contoh query insert
         await Database.raw(`
             UPDATE public.siswas
-            SET nama='${params.nama}', email='${params.email}', "password"='${params.password}', kelas='${params.kelas}', umur=${params.umur}
+            SET nama='${params.nama}', email='${params.email}', "password"='${params.password}', kelas='${params.kelas}', umur=${params.umur}, updated_by='${dataUser.nama}'
             WHERE id=${params.id};
         ;            
         `) 
