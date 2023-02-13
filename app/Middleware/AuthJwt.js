@@ -3,7 +3,7 @@
 const Env = use('Env')
 const jwt = require('jsonwebtoken')
 
-class TiketAcak {
+class AuthJwt {
   async handle({ request }, next) {
     try {
       if(!request.header('Authorization')){
@@ -27,4 +27,4 @@ class TiketAcak {
   }
 }
 
-module.exports = TiketAcak
+module.exports = AuthJwt

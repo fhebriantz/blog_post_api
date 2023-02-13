@@ -38,7 +38,7 @@ const Route = use('Route')
     Route.post('/delete_siswa', 'DashboardController.deleteSiswa')
     Route.get('/show_siswa', 'DashboardController.showSiswa')
   }).middleware([
-    'tiketRandom'
+    'authJwt'
   ])
 
   Route.group(() => {
