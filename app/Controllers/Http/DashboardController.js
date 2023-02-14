@@ -2,7 +2,8 @@
 const Database = use('Database')
 const { validate } = use('Validator')
 const Hash = use('Hash')
-const Helpers = use('Helpers')
+const moment = require('moment')
+const _ = require('lodash')
 
 class DashboardController {
     async dataKuadrat ({ request, response }) {
@@ -69,11 +70,11 @@ class DashboardController {
         // contoh query insert
 
         const safePassword = await Hash.make(password)
-
+    
         await Database.raw(`
         INSERT INTO public.siswas
-            (nama, email, "password", kelas, umur, updated_by)
-            VALUES('${nama}', '${emailLower}', '${safePassword}', '${kelas}', ${umur}, ${dataUser.nama});            
+            (nama, email, "password", kelas, umur, updated_by,created_at)
+            VALUES('${nama}', '${emailLower}', '${safePassword}', '${kelas}', ${umur}, '${dataUser.nama}','${moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")}');            
         `) 
 
         const data = await Database.raw(`select * from public.siswas`)
@@ -146,9 +147,8 @@ class DashboardController {
         // contoh query insert
         await Database.raw(`
             UPDATE public.siswas
-            SET nama='${params.nama}', email='${params.email}', "password"='${params.password}', kelas='${params.kelas}', umur=${params.umur}, updated_by='${dataUser.nama}'
-            WHERE id=${params.id};
-        ;            
+            SET nama='${params.nama}', email='${params.email}', "password"='${params.password}', kelas='${params.kelas}', umur=${params.umur}, updated_by='${dataUser.nama}', updated_at='${moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')}'
+            WHERE id=${params.id};            
         `) 
 
         const data = await Database.raw(`select * from public.siswas`)
@@ -194,11 +194,68 @@ class DashboardController {
 
     async showSiswa ({  }) {
         const data = await Database.raw(`select * from public.siswas`)
-        
         //ngasih pesan berhasil
         return {
             messages : 'data berhasil diperoleh',
-            data : data.rows
+            
+            data : data.rows.map(function (row) {
+                return {
+                    id : row.id,
+                    nama : row.nama,
+                    email : row.email,
+                    kelas : row.kelas,
+                    umur : row.umur,
+                    created_at : moment(row.created_at).format('Do MMMM YYYY, h:mm:ss a'),
+                    updated_at : moment(row.updated_at).format('Do MMMM YYYY, h:mm:ss a'),
+                    admin : row.updated_by
+                }
+              })
+        }
+        
+    }
+
+    async showSiswaByFind ({ request }) {
+        const { umur } = request.all();
+        const rules = {
+            umur: "required",
+        };
+
+        const validation = await validate(request.all(), rules);
+
+        if (validation.fails()) {
+            response.status(400);
+            return validation.messages();
+        }
+
+        const data = await Database.raw(`select * from public.siswas`)
+        //ngasih pesan berhasil
+        const filter = _.find(data.rows, ['umur', parseInt(umur)]);
+        return {
+            messages : 'data berhasil diperoleh',
+            data : filter
+        }
+        
+    }
+
+    async showSiswaByFilter ({ request }) {
+        const { umur } = request.all();
+        const rules = {
+            umur: "required",
+        };
+
+        const validation = await validate(request.all(), rules);
+
+        if (validation.fails()) {
+            response.status(400);
+            return validation.messages();
+        }
+
+        const data = await Database.raw(`select * from public.siswas`)
+        //ngasih pesan berhasil
+        const filter = _.filter(data.rows, ['umur', parseInt(umur)]);
+        return {
+            messages : 'data berhasil diperoleh',
+            data : filter
         }
         
     }

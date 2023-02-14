@@ -37,6 +37,8 @@ const Route = use('Route')
     Route.post('/update_siswa', 'DashboardController.updateSiswa')
     Route.post('/delete_siswa', 'DashboardController.deleteSiswa')
     Route.get('/show_siswa', 'DashboardController.showSiswa')
+    Route.get('/show_siswa_by_find', 'DashboardController.showSiswaByFind')
+    Route.get('/show_siswa_by_filter', 'DashboardController.showSiswaByFilter')
   }).middleware([
     'authJwt'
   ])
