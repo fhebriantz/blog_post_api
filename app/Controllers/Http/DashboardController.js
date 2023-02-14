@@ -49,7 +49,7 @@ class DashboardController {
 
      async insertSiswa ({ request, response }) {
         const { nama, email, password, kelas, umur } = request.all();
-
+        const { dataUser } = request
         const rules = {
             nama: "required",
             email: "required|email|unique:public.siswas,email", //1 req or not req, 2 tipe, 3 aturan uniq (schema.table,kolom)
@@ -65,20 +65,6 @@ class DashboardController {
             return validation.messages();
         }
 
-        // const profilePic = request.file('profile_pic', {
-        //     types: ['image'],
-        //     size: '2mb'
-        // })
-        
-        // await profilePic.move(Helpers.tmpPath('uploads'), {
-        //     name: 'custom-name.jpg',
-        //     overwrite: true
-        // })
-    
-        // if (!profilePic.moved()) {
-        //     return profilePic.error()
-        // }
-
         const emailLower = email.toLowerCase()
         // contoh query insert
 
@@ -86,8 +72,8 @@ class DashboardController {
 
         await Database.raw(`
         INSERT INTO public.siswas
-            (nama, email, "password", kelas, umur)
-            VALUES('${nama}', '${emailLower}', '${safePassword}', '${kelas}', ${umur});            
+            (nama, email, "password", kelas, umur, updated_by)
+            VALUES('${nama}', '${emailLower}', '${safePassword}', '${kelas}', ${umur}, ${dataUser.nama});            
         `) 
 
         const data = await Database.raw(`select * from public.siswas`)
