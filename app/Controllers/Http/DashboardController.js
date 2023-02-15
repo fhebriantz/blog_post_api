@@ -259,6 +259,45 @@ class DashboardController {
         }
         
     }
+
+    async geoArea ({request, response}){
+        const { type } = request.all()
+        const validation = await validate(request.all(), {
+            type: 'required'
+        })
+
+        if (validation.fails()) {
+            response.status(400)
+            return validation.messages()
+        }
+
+        try {
+        const query = await Database.raw(`SELECT * FROM public.area where type = '${type}';`)
+        
+        return {
+            type: "FeatureCollection",
+            features: query.rows.map( row => {
+                return {
+                    type : "Feature",
+                    properties : {
+                        name: row.name,
+                        type: row.type
+                      },
+                    geometry : {
+                        coordinates: [
+                            row.longitude,
+                            row.latitude
+                        ],
+                        type: "Point"
+                      }
+                }
+              })
+        }
+        } catch (error) {
+        response.status(500)
+        return error
+        }
+    }
 }
 
 module.exports = DashboardController

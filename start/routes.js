@@ -32,6 +32,7 @@ const Route = use('Route')
   Route.group(() => {
     Route.post('/data_kuadrat', 'DashboardController.dataKuadrat')
     Route.get('/get_kelas', 'DashboardController.dataKelas')
+    Route.get('/geo_area', 'DashboardController.geoArea')
     Route.post('/insert_siswa', 'DashboardController.insertSiswa')
     Route.post('/import_siswa', 'DashboardController.importSiswa')
     Route.post('/update_siswa', 'DashboardController.updateSiswa')
